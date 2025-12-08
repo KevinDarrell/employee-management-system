@@ -23,7 +23,15 @@ export const getEmployees = async (req: Request, res: Response, next: NextFuncti
     const whereClause: any = {};
     if (department) whereClause.department = String(department);
     if (status) whereClause.status = String(status);
-    if (search) whereClause.name = { contains: String(search), mode: 'insensitive' };
+
+    if (search) {
+      whereClause.OR = [
+        { name: { contains: String(search), mode: 'insensitive' } },
+        { email: { contains: String(search), mode: 'insensitive' } },
+        { position: { contains: String(search), mode: 'insensitive' } },
+        { department: { contains: String(search), mode: 'insensitive' } },
+      ];
+    }
 
     const [employees, total] = await Promise.all([
       prisma.employee.findMany({
@@ -102,12 +110,11 @@ export const deleteEmployee = async (req: Request, res: Response, next: NextFunc
     const exists = await prisma.employee.findUnique({ where: { id: Number(id) }});
     if (!exists) throwNotFound("Employee not found");
 
-    await prisma.employee.update({
+    await prisma.employee.delete({
       where: { id: Number(id) },
-      data: { status: 'inactive' }
     });
 
-    res.json({ message: "Employee deactivated successfully" });
+    res.json({ message: "Employee deleted permanently" });
   } catch (error) {
     next(error);
   }
