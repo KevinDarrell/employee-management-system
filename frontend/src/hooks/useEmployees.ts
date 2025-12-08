@@ -75,18 +75,33 @@ export const useSaveEmployee = (initialId?: string) => {
       const { id: _, ...dataToSend } = variables;
 
       if (targetId) {
-        return await api.put(`/employees/${targetId}`, dataToSend);
+        // Tandai bahwa ini adalah update
+        return { 
+          result: await api.put(`/employees/${targetId}`, dataToSend), 
+          action: 'update',
+          payload: variables 
+        };
       }
-      return await api.post('/employees', dataToSend);
+      // Tandai bahwa ini create
+      return { 
+        result: await api.post('/employees', dataToSend), 
+        action: 'create',
+        payload: variables
+      };
     },
-    onSuccess: (_, variables) => { // variable berisi data yang dikirim
-      // LOGIC TOAST PINTAR
-      if (variables.status === 'inactive') {
+    onSuccess: (data) => {
+      const { action, payload } = data;
+
+      // LOGIC PESAN LEBIH PINTAR
+      if (action === 'create') {
+        toast.success('New employee added successfully');
+      } else if (payload.status === 'inactive') {
         toast.success('Employee deactivated');
-      } else if (variables.status === 'active') {
+      } else if (payload.status === 'active' && Object.keys(payload).length === 2) { 
+        // Cek length 2 artinya cuma kirim {id, status} -> Toggle Action
         toast.success('Employee activated');
       } else {
-        toast.success('Operation successful'); // Default untuk Add/Edit Form
+        toast.success('Employee data updated'); // Edit Form biasa
       }
       
       queryClient.invalidateQueries({ queryKey: ['employees'] });

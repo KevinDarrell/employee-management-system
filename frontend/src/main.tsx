@@ -21,7 +21,26 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <App />
-        <Toaster position="top-right" />
+        <Toaster 
+          position="top-center" // Pindah ke tengah atas
+          toastOptions={{
+            style: {
+              background: '#333',
+              color: '#fff',
+              borderRadius: '8px',
+              padding: '12px 24px',
+              fontSize: '14px',
+            },
+            success: {
+              style: { background: '#10B981' }, // Hijau Modern
+              iconTheme: { primary: '#fff', secondary: '#10B981' }
+            },
+            error: {
+              style: { background: '#EF4444' }, // Merah Modern
+              iconTheme: { primary: '#fff', secondary: '#EF4444' }
+            }
+          }} 
+        />
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>,

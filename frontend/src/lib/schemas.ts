@@ -5,7 +5,8 @@ export const employeeFormSchema = z.object({
   email: z.string().email("Invalid email format"),
   position: z.string().min(2, "Position is required"),
   department: z.string().min(1, "Please select a department"),
-  salary: z.number().min(0, "Salary cannot be negative"),
+  salary: z.number()
+    .min(1000000, "Salary too low (Min: Rp 1.000.000)"),
   hire_date: z.string().min(1, "Hire date is required"),
   status: z.enum(['active', 'inactive']),
 });

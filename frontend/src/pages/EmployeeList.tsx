@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'; // Import Animasi
 import { useEmployees, useSaveEmployee, useDeleteEmployee } from '../hooks/useEmployees';
 import { Skeleton } from '../components/ui/Skeleton';
 import { Breadcrumbs } from '../components/ui/Breadcrumbs';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 const EmployeeList = () => {
   const [page, setPage] = useState(1);
@@ -14,26 +15,54 @@ const EmployeeList = () => {
   const [statusFilter, setStatusFilter] = useState('');
 
   const { data, isLoading, isError } = useEmployees({ 
-    page, limit: 5, search, department, status: statusFilter 
+    page, limit: 10, search, department, status: statusFilter 
   });
-  
-  // Hook Delete Permanen (Tombol Tong Sampah)
+
+  const [dialogConfig, setDialogConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'danger' | 'warning';
+    onConfirm: () => void;
+  }>({ isOpen: false, title: '', message: '', type: 'danger', onConfirm: () => {} });
+
+  // Hook Actions
   const deleteMutation = useDeleteEmployee();
-  
-  const handleDelete = (id: number, name: string) => {
-    if (window.confirm(`Permanently delete ${name}? This cannot be undone.`)) {
-      deleteMutation.mutate(id);
-    }
+  const updateMutation = useSaveEmployee();
+
+  // Handler Delete (Buka Dialog)
+  const confirmDelete = (id: number, name: string) => {
+    setDialogConfig({
+      isOpen: true,
+      title: 'Delete Employee',
+      message: `Are you sure you want to permanently delete ${name}? This action cannot be undone.`,
+      type: 'danger',
+      onConfirm: () => {
+        deleteMutation.mutate(id);
+        setDialogConfig(prev => ({ ...prev, isOpen: false }));
+      },
+    });
   };
 
-  // Logic Toggle Status
-  const updateMutation = useSaveEmployee();
+  // Handler Toggle (Buka Dialog jika Inactive)
   const handleToggle = (emp: any) => {
     const newStatus = emp.status === 'active' ? 'inactive' : 'active';
+    
     if (newStatus === 'inactive') {
-      if(!window.confirm(`Deactivate ${emp.name}? They won't appear in active stats.`)) return;
+      setDialogConfig({
+        isOpen: true,
+        title: 'Deactivate Employee',
+        message: `Are you sure you want to deactivate ${emp.name}? They will be hidden from active stats.`,
+        type: 'warning',
+        onConfirm: () => {
+          updateMutation.mutate({ id: emp.id, status: newStatus });
+          setDialogConfig(prev => ({ ...prev, isOpen: false }));
+        },
+      });
+    } else {
+      // Kalau Activate langsung saja tanpa dialog
+      updateMutation.mutate({ id: emp.id, status: newStatus });
     }
-    updateMutation.mutate({ id: emp.id, status: newStatus }); // Kirim ID dan data partial
   };
 
   return (
@@ -84,21 +113,19 @@ const EmployeeList = () => {
       </div>
 
       {/* Table Content */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col h-[600px]">
         {isLoading ? (
-          <div className="p-6 space-y-4">
-            {[1,2,3,4,5].map(i => <div key={i} className="flex gap-4"><Skeleton className="h-12 w-1/4" /><Skeleton className="h-12 w-1/4" /><Skeleton className="h-12 w-1/2" /></div>)}
-          </div>
+           <div className="p-6 space-y-4"><Skeleton className="h-12 w-full" /><Skeleton className="h-12 w-full" /></div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="flex-1 overflow-auto relative"> {/* Scrollable Area */}
             <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50/50 text-gray-500 uppercase font-semibold">
+              <thead className="bg-gray-50 text-gray-500 uppercase font-semibold sticky top-0 z-10 shadow-sm">
                 <tr>
-                  <th className="px-6 py-4">Name / Email</th>
-                  <th className="px-6 py-4">Position</th>
-                  <th className="px-6 py-4">Departement</th>
-                  <th className="px-6 py-4 text-center">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4 bg-gray-50">Name / Email</th>
+                  <th className="px-6 py-4 bg-gray-50">Position</th>
+                  <th className="px-6 py-4 bg-gray-50">Department</th>
+                  <th className="px-6 py-4 bg-gray-50 text-center">Status</th>
+                  <th className="px-6 py-4 bg-gray-50 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -106,10 +133,8 @@ const EmployeeList = () => {
                   {data?.data.map((employee, index) => (
                     <motion.tr 
                       key={employee.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      transition={{ delay: index * 0.05 }} // Staggered animation
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       className="hover:bg-blue-50/30 transition-colors"
                     >
                       <td className="px-6 py-4">
@@ -129,47 +154,25 @@ const EmployeeList = () => {
                       
                       {/* TOGGLE STATUS (Soft Delete Logic) */}
                       <td className="px-6 py-4 text-center">
-                        <div className="flex flex-col items-center gap-1.5">
-                          {/* Tombol Toggle */}
+                         <div className="flex flex-col items-center gap-1.5">
                           <button
                             onClick={() => handleToggle(employee)}
                             className={clsx(
-                              "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
-                              employee.status === 'active' 
-                                ? "bg-emerald-500 focus:ring-emerald-500" 
-                                : "bg-slate-300 focus:ring-slate-400"
+                              "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
+                              employee.status === 'active' ? "bg-emerald-500" : "bg-slate-300"
                             )}
                           >
-                            <span className={clsx("inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm", employee.status === 'active' ? "translate-x-6" : "translate-x-1")} />
+                            <span className={clsx("inline-block h-4 w-4 transform rounded-full bg-white transition-transform", employee.status === 'active' ? "translate-x-6" : "translate-x-1")} />
                           </button>
-                          
-                          {/* Label Status Modern */}
-                          <span className={clsx(
-                            "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
-                            employee.status === 'active'
-                              ? "text-emerald-700 bg-emerald-50 border-emerald-100"
-                              : "text-slate-500 bg-slate-100 border-slate-200"
-                          )}>
-                            {employee.status}
-                          </span>
+                          <span className={clsx("text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border", employee.status === 'active' ? "text-emerald-700 bg-emerald-50 border-emerald-100" : "text-slate-500 bg-slate-100 border-slate-200")}>{employee.status}</span>
                         </div>
                       </td>
 
-                      {/* ACTION BUTTONS (Edit & Permanen Delete) */}
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
-                          <Link 
-                            to={`/employees/edit/${employee.id}`}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Link>
-                          <button 
-                            onClick={() => handleDelete(employee.id, employee.name)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          <Link to={`/employees/edit/${employee.id}`} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"><Edit className="w-4 h-4" /></Link>
+                          {/* DELETE TRIGGER DIALOG */}
+                          <button onClick={() => confirmDelete(employee.id, employee.name)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
                         </div>
                       </td>
                     </motion.tr>
@@ -177,10 +180,33 @@ const EmployeeList = () => {
                 </AnimatePresence>
               </tbody>
             </table>
-            {/* Pagination UI sama ... */}
+          </div>
+        )}
+        
+        {/* Pagination Tetap di Bawah (Sticky Bottom di dalam container flex) */}
+        {data?.meta && (
+          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
+             {/* ... Pagination Controls UI ... */}
+             <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">Page {data.meta?.page} of {data.meta?.lastPage}</span>
+                <div className="flex space-x-2">
+                   <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-2 border border-gray-300 rounded hover:bg-white disabled:opacity-50"><ChevronLeft className="w-4 h-4"/></button>
+                   <button onClick={() => setPage(p => Math.min(data.meta?.lastPage || 1, p + 1))} disabled={page === data.meta?.lastPage} className="p-2 border border-gray-300 rounded hover:bg-white disabled:opacity-50"><ChevronRight className="w-4 h-4"/></button>
+                </div>
+             </div>
           </div>
         )}
       </div>
+
+      {/* RENDER DIALOG GLOBAL */}
+      <ConfirmDialog
+        isOpen={dialogConfig.isOpen}
+        title={dialogConfig.title}
+        message={dialogConfig.message}
+        type={dialogConfig.type}
+        onConfirm={dialogConfig.onConfirm}
+        onCancel={() => setDialogConfig(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };
