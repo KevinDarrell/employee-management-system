@@ -1,13 +1,15 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ChevronLeft, Save } from 'lucide-react';
+import { motion } from 'framer-motion'; // Animasi Form
 
 import { useSaveEmployee, useEmployee } from '../hooks/useEmployees';
 import { employeeFormSchema, type EmployeeFormValues } from '../lib/schemas';
 import { FormInput } from '../components/ui/FormInput';
 import { FormSelect } from '../components/ui/FormSelect';
+import { Skeleton } from '../components/ui/Skeleton';
 
 const DEPARTMENTS = [
   { value: 'IT', label: 'IT' },
@@ -22,7 +24,7 @@ const EmployeeForm = () => {
   const isEditMode = !!id;
 
   const { data: existingEmployee, isLoading: isLoadingData } = useEmployee(id);
-  const mutation = useSaveEmployee(id);
+  const mutation = useSaveEmployee(id); // Jika ada ID, dia update. Jika null, create.
 
   const {
     register,
@@ -31,7 +33,7 @@ const EmployeeForm = () => {
     formState: { errors, isSubmitting },
   } = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeFormSchema),
-    mode: 'onChange',
+    mode: 'onTouched', // <--- SMOOTHER UX: Validasi saat disentuh/blur
     defaultValues: {
       name: '',
       email: '',
@@ -39,45 +41,42 @@ const EmployeeForm = () => {
       department: '',
       salary: 0,
       hire_date: '',
-      status: 'active', 
+      status: 'active', // Default hidden value
     },
   });
 
   useEffect(() => {
     if (existingEmployee) {
       const formattedDate = new Date(existingEmployee.hire_date).toISOString().split('T')[0];
-      reset({
-        name: existingEmployee.name,
-        email: existingEmployee.email,
-        position: existingEmployee.position,
-        department: existingEmployee.department,
-        salary: existingEmployee.salary,
-        hire_date: formattedDate,
-        status: existingEmployee.status,
-      });
+      reset({ ...existingEmployee, hire_date: formattedDate });
     }
   }, [existingEmployee, reset]);
 
   const onSubmit = (data: EmployeeFormValues) => {
+    // Pastikan status terbawa (atau backend handle default)
     mutation.mutate(data, {
       onSuccess: () => navigate('/employees'),
     });
   };
 
-  if (isEditMode && isLoadingData) return <div className="p-8 text-center text-gray-500">Loading...</div>;
+  if (isEditMode && isLoadingData) return <div className="max-w-2xl mx-auto space-y-6"><Skeleton className="h-10 w-48" /><Skeleton className="h-96 w-full" /></div>;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-2xl mx-auto space-y-6"
+    >
       <div className="flex items-center space-x-4">
-        <Link to="/employees" className="p-2 hover:bg-gray-100 rounded-full text-gray-600">
+        <Link to="/employees" className="p-2 hover:bg-gray-100 rounded-full text-gray-600 transition-colors">
           <ChevronLeft className="w-6 h-6" />
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-gray-800">
           {isEditMode ? 'Edit Employee' : 'Add New Employee'}
         </h1>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           
           <FormInput
@@ -119,58 +118,33 @@ const EmployeeForm = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormInput
-              label="Hire Date"
-              type="date"
-              error={errors.hire_date}
-              {...register('hire_date')}
-            />
-            
-            {/* Radio Button Manual (Karena structure unik) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-              <div className="flex space-x-4 mt-2">
-                <label className="flex items-center cursor-pointer">
-                  <input 
-                    {...register('status')} 
-                    type="radio" 
-                    value="active" 
-                    className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" 
-                  />
-                  <span className="ml-2 text-gray-700">Active</span>
-                </label>
-                <label className="flex items-center cursor-pointer">
-                  <input 
-                    {...register('status')} 
-                    type="radio" 
-                    value="inactive" 
-                    className="w-4 h-4 text-red-600 focus:ring-red-500 border-gray-300" 
-                  />
-                  <span className="ml-2 text-gray-700">Inactive</span>
-                </label>
-              </div>
-              {/* Menampilkan error status jika ada */}
-              {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status.message}</p>}
-            </div>
-          </div>
+          {/* Hire Date Full Width karena Status sudah dihapus */}
+          <FormInput
+            label="Hire Date"
+            type="date"
+            error={errors.hire_date}
+            {...register('hire_date')}
+          />
+          
+          {/* Hidden Status Field (Untuk menjaga konsistensi data form) */}
+          <input type="hidden" {...register('status')} />
 
-          <div className="flex justify-end pt-4 border-t border-gray-100">
-            <Link to="/employees" className="px-6 py-2 mr-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          <div className="flex justify-end pt-6 border-t border-gray-100">
+            <Link to="/employees" className="px-6 py-2.5 mr-4 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
               Cancel
             </Link>
             <button
               type="submit"
               disabled={isSubmitting || mutation.isPending}
-              className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="flex items-center px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-70 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all"
             >
-              <Save className="w-5 h-5 mr-2" />
+              <Save className="w-4 h-4 mr-2" />
               {isSubmitting || mutation.isPending ? 'Saving...' : 'Save Employee'}
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -66,19 +66,25 @@ export const useEmployee = (id: string | undefined) => {
 };
 
 // --- HOOK 5: CREATE / UPDATE ---
-export const useSaveEmployee = (id?: string) => {
+export const useSaveEmployee = (initialId?: string) => { // initialId opsional
   const queryClient = useQueryClient();
-  const isEdit = !!id;
 
   return useMutation({
-    mutationFn: async (data: Partial<Employee>) => {
-      if (isEdit) {
-        return await api.put(`/employees/${id}`, data);
+    // Revisi mutationFn agar bisa terima {id, ...data} atau data saja
+    mutationFn: async (variables: any) => {
+      // Jika variable punya ID, pakai ID itu. Jika tidak, pakai initialId
+      const targetId = variables.id || initialId; 
+      
+      // Bersihkan ID dari payload data agar tidak dikirim ke body
+      const { id: _, ...dataToSend } = variables; 
+
+      if (targetId) {
+        return await api.put(`/employees/${targetId}`, dataToSend);
       }
-      return await api.post('/employees', data);
+      return await api.post('/employees', dataToSend);
     },
     onSuccess: () => {
-      toast.success(isEdit ? 'Employee updated!' : 'Employee created!');
+      toast.success('Operation successful!');
       queryClient.invalidateQueries({ queryKey: ['employees'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     },

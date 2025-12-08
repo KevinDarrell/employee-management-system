@@ -124,7 +124,7 @@ export const getStats = async (req: Request, res: Response, next: NextFunction) 
     });
 
     const recentEmployees = await prisma.employee.findMany({
-      take: 5,
+      take: 20,
       orderBy: { createdAt: 'desc' }, 
       select: {
         id: true,
