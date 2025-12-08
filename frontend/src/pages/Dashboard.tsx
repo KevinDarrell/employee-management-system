@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Users, Briefcase, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useStats } from '../hooks/useEmployees';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
