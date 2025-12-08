@@ -123,13 +123,27 @@ export const getStats = async (req: Request, res: Response, next: NextFunction) 
       _avg: { salary: true }
     });
 
+    const recentEmployees = await prisma.employee.findMany({
+      take: 5,
+      orderBy: { createdAt: 'desc' }, 
+      select: {
+        id: true,
+        name: true,
+        department: true,
+        position: true,
+        status: true,
+        hire_date: true
+      }
+    });
+
     res.json({
       totalEmployees,
       breakdown: deptStats.map(d => ({
         department: d.department,
         count: d._count.id,
         avgSalary: Math.round(d._avg.salary || 0)
-      }))
+      })),
+      recent: recentEmployees
     });
   } catch (error) {
     next(error);
