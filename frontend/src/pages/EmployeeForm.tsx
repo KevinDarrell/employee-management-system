@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useParams, Link } from 'react-router-dom';
@@ -31,7 +31,7 @@ const EmployeeForm = () => {
     formState: { errors, isSubmitting },
   } = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeFormSchema),
-    // FIX ERROR 2: Definisikan defaultValues disini secara eksplisit
+    mode: 'onChange',
     defaultValues: {
       name: '',
       email: '',
@@ -39,7 +39,7 @@ const EmployeeForm = () => {
       department: '',
       salary: 0,
       hire_date: '',
-      status: 'active', // <--- Default Value dihandle oleh UI (React), bukan Zod
+      status: 'active', 
     },
   });
 
