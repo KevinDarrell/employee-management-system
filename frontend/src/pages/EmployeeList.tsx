@@ -22,7 +22,7 @@ const EmployeeList = () => {
     isOpen: boolean;
     title: string;
     message: string;
-    type: 'danger' | 'warning';
+    type: 'danger' | 'warning'| 'info';
     onConfirm: () => void;
   }>({ isOpen: false, title: '', message: '', type: 'danger', onConfirm: () => {} });
 
@@ -46,23 +46,31 @@ const EmployeeList = () => {
 
   // Handler Toggle (Buka Dialog jika Inactive)
   const handleToggle = (emp: any) => {
-    const newStatus = emp.status === 'active' ? 'inactive' : 'active';
+    const isCurrentlyActive = emp.status === 'active';
+    const newStatus = isCurrentlyActive ? 'inactive' : 'active';
     
-    if (newStatus === 'inactive') {
-      setDialogConfig({
-        isOpen: true,
-        title: 'Deactivate Employee',
-        message: `Are you sure you want to deactivate ${emp.name}? They will be hidden from active stats.`,
-        type: 'warning',
-        onConfirm: () => {
-          updateMutation.mutate({ id: emp.id, status: newStatus });
-          setDialogConfig(prev => ({ ...prev, isOpen: false }));
-        },
-      });
-    } else {
-      // Kalau Activate langsung saja tanpa dialog
-      updateMutation.mutate({ id: emp.id, status: newStatus });
-    }
+    const dialogTitle = isCurrentlyActive ? 'Deactivate Employee' : 'Activate Employee';
+    
+    const dialogMessage = isCurrentlyActive 
+      ? `Are you sure you want to deactivate ${emp.name}? They will be hidden from active stats.`
+      : `Are you sure you want to activate ${emp.name}? They will appear in active stats again.`;
+      
+    const dialogType = isCurrentlyActive ? 'warning' : 'info'; // Kuning vs Biru
+    
+    const confirmButtonText = isCurrentlyActive ? 'Deactivate' : 'Activate';
+
+    setDialogConfig({
+      isOpen: true,
+      title: dialogTitle,
+      message: dialogMessage,
+      type: dialogType,
+      onConfirm: () => {
+        // Panggil API Update
+        updateMutation.mutate({ id: emp.id, status: newStatus });
+        // Tutup Dialog
+        setDialogConfig(prev => ({ ...prev, isOpen: false }));
+      },
+    });
   };
 
   return (
