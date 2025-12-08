@@ -4,12 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ChevronLeft, Save } from 'lucide-react';
 import { motion } from 'framer-motion'; // Animasi Form
-
 import { useSaveEmployee, useEmployee } from '../hooks/useEmployees';
 import { employeeFormSchema, type EmployeeFormValues } from '../lib/schemas';
 import { FormInput } from '../components/ui/FormInput';
 import { FormSelect } from '../components/ui/FormSelect';
 import { Skeleton } from '../components/ui/Skeleton';
+import { Breadcrumbs } from '../components/ui/Breadcrumbs';
 
 const DEPARTMENTS = [
   { value: 'IT', label: 'IT' },
@@ -59,6 +59,11 @@ const EmployeeForm = () => {
     });
   };
 
+  const breadcrumbItems = [
+    { label: 'Employees', href: '/employees' },
+    { label: isEditMode ? 'Edit Employee' : 'Add New Employee' }
+  ];
+
   if (isEditMode && isLoadingData) return <div className="max-w-2xl mx-auto space-y-6"><Skeleton className="h-10 w-48" /><Skeleton className="h-96 w-full" /></div>;
 
   return (
@@ -67,6 +72,7 @@ const EmployeeForm = () => {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
+        <Breadcrumbs items={breadcrumbItems} />
       <div className="flex items-center space-x-4">
         <Link to="/employees" className="p-2 hover:bg-gray-100 rounded-full text-gray-600 transition-colors">
           <ChevronLeft className="w-6 h-6" />

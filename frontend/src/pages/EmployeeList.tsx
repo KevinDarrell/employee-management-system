@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion'; // Import Animasi
 import { useEmployees, useSaveEmployee, useDeleteEmployee } from '../hooks/useEmployees';
 import { Skeleton } from '../components/ui/Skeleton';
+import { Breadcrumbs } from '../components/ui/Breadcrumbs';
 
 const EmployeeList = () => {
   const [page, setPage] = useState(1);
@@ -37,8 +38,8 @@ const EmployeeList = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header & Filter Section (Sama seperti sebelumnya, singkatnya saya taruh sini) */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <Breadcrumbs items={[{ label: 'Employees' }]} />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-800">Employees</h1>
         <Link to="/employees/new" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition-all hover:-translate-y-0.5">
           <Plus className="w-5 h-5 mr-2" /> New Employee
@@ -93,8 +94,9 @@ const EmployeeList = () => {
             <table className="w-full text-sm text-left">
               <thead className="bg-gray-50/50 text-gray-500 uppercase font-semibold">
                 <tr>
-                  <th className="px-6 py-4">Name</th>
-                  <th className="px-6 py-4">Info</th>
+                  <th className="px-6 py-4">Name / Email</th>
+                  <th className="px-6 py-4">Position</th>
+                  <th className="px-6 py-4">Departemen</th>
                   <th className="px-6 py-4 text-center">Status</th>
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
@@ -114,9 +116,13 @@ const EmployeeList = () => {
                         <div className="font-semibold text-gray-900">{employee.name}</div>
                         <div className="text-gray-500 text-xs">{employee.email}</div>
                       </td>
+                      <td className="px-6 py-4 text-gray-700 font-medium">
+                        {employee.position}
+                      </td>
+
+                      {/* KOLOM DEPARTMENT (Sendiri) */}
                       <td className="px-6 py-4">
-                        <div className="text-gray-900">{employee.position}</div>
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 mt-1">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
                           {employee.department}
                         </span>
                       </td>
