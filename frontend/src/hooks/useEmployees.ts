@@ -43,7 +43,7 @@ export const useDeleteEmployee = () => {
       return await api.delete(`/employees/${id}`);
     },
     onSuccess: () => {
-      toast.success('Employee deactivated successfully');
+      toast.success('Employee deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['employees'] }); // Refresh list
       queryClient.invalidateQueries({ queryKey: ['stats'] });     // Refresh dashboard
     },
@@ -82,7 +82,7 @@ export const useSaveEmployee = (initialId?: string) => {
     onSuccess: (_, variables) => { // variable berisi data yang dikirim
       // LOGIC TOAST PINTAR
       if (variables.status === 'inactive') {
-        toast.success('Employee deactivated (Soft Delete)');
+        toast.success('Employee deactivated');
       } else if (variables.status === 'active') {
         toast.success('Employee activated');
       } else {

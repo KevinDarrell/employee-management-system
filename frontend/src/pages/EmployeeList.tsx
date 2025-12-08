@@ -52,7 +52,7 @@ const EmployeeList = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Search by name..."
+            placeholder="Search by name, email, position..."
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
@@ -96,7 +96,7 @@ const EmployeeList = () => {
                 <tr>
                   <th className="px-6 py-4">Name / Email</th>
                   <th className="px-6 py-4">Position</th>
-                  <th className="px-6 py-4">Departemen</th>
+                  <th className="px-6 py-4">Departement</th>
                   <th className="px-6 py-4 text-center">Status</th>
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
@@ -129,15 +129,30 @@ const EmployeeList = () => {
                       
                       {/* TOGGLE STATUS (Soft Delete Logic) */}
                       <td className="px-6 py-4 text-center">
-                        <button
-                          onClick={() => handleToggle(employee)}
-                          className={clsx(
-                            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-                            employee.status === 'active' ? "bg-green-500" : "bg-gray-300"
-                          )}
-                        >
-                          <span className={clsx("inline-block h-4 w-4 transform rounded-full bg-white transition-transform", employee.status === 'active' ? "translate-x-6" : "translate-x-1")} />
-                        </button>
+                        <div className="flex flex-col items-center gap-1.5">
+                          {/* Tombol Toggle */}
+                          <button
+                            onClick={() => handleToggle(employee)}
+                            className={clsx(
+                              "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+                              employee.status === 'active' 
+                                ? "bg-emerald-500 focus:ring-emerald-500" 
+                                : "bg-slate-300 focus:ring-slate-400"
+                            )}
+                          >
+                            <span className={clsx("inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm", employee.status === 'active' ? "translate-x-6" : "translate-x-1")} />
+                          </button>
+                          
+                          {/* Label Status Modern */}
+                          <span className={clsx(
+                            "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
+                            employee.status === 'active'
+                              ? "text-emerald-700 bg-emerald-50 border-emerald-100"
+                              : "text-slate-500 bg-slate-100 border-slate-200"
+                          )}>
+                            {employee.status}
+                          </span>
+                        </div>
                       </td>
 
                       {/* ACTION BUTTONS (Edit & Permanen Delete) */}
