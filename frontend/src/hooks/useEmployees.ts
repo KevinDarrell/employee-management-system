@@ -66,25 +66,29 @@ export const useEmployee = (id: string | undefined) => {
 };
 
 // --- HOOK 5: CREATE / UPDATE ---
-export const useSaveEmployee = (initialId?: string) => { // initialId opsional
+export const useSaveEmployee = (initialId?: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    // Revisi mutationFn agar bisa terima {id, ...data} atau data saja
     mutationFn: async (variables: any) => {
-      // Jika variable punya ID, pakai ID itu. Jika tidak, pakai initialId
-      const targetId = variables.id || initialId; 
-      
-      // Bersihkan ID dari payload data agar tidak dikirim ke body
-      const { id: _, ...dataToSend } = variables; 
+      const targetId = variables.id || initialId;
+      const { id: _, ...dataToSend } = variables;
 
       if (targetId) {
         return await api.put(`/employees/${targetId}`, dataToSend);
       }
       return await api.post('/employees', dataToSend);
     },
-    onSuccess: () => {
-      toast.success('Operation successful!');
+    onSuccess: (_, variables) => { // variable berisi data yang dikirim
+      // LOGIC TOAST PINTAR
+      if (variables.status === 'inactive') {
+        toast.success('Employee deactivated (Soft Delete)');
+      } else if (variables.status === 'active') {
+        toast.success('Employee activated');
+      } else {
+        toast.success('Operation successful'); // Default untuk Add/Edit Form
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['employees'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
