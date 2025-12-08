@@ -1,18 +1,15 @@
-import { useQuery } from '@tanstack/react-query';
-import api from '../lib/axios'; 
 import { Users, DollarSign, Briefcase } from 'lucide-react';
+import { useStats } from '../hooks/useEmployees'; // Import Hook
 
 const Dashboard = () => {
-  const { data: stats, isLoading, error } = useQuery({
-    queryKey: ['stats'],
-    queryFn: async () => {
-      const res = await api.get('/employees/stats');
-      return res.data;
-    }
-  });
+  // Panggil Custom Hook
+  const { data: stats, isLoading, error } = useStats();
 
   if (isLoading) return <div className="p-8 text-center text-gray-500">Loading Dashboard...</div>;
   if (error) return <div className="p-8 text-center text-red-500">Error loading stats. Is backend running?</div>;
+
+  // Pastikan data ada sebelum dirender
+  if (!stats) return null;
 
   const statCards = [
     { 
@@ -33,7 +30,7 @@ const Dashboard = () => {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
 
-    
+      {/* Top Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
           <div key={card.label} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
@@ -48,7 +45,7 @@ const Dashboard = () => {
         ))}
       </div>
 
-
+      {/* Department Breakdown Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
           <h2 className="font-semibold text-gray-800">Department Breakdown</h2>
@@ -63,7 +60,7 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {stats.breakdown.map((dept: any) => (
+              {stats.breakdown.map((dept) => (
                 <tr key={dept.department} className="border-b hover:bg-gray-50">
                   <td className="px-6 py-4 font-medium">{dept.department}</td>
                   <td className="px-6 py-4">{dept.count}</td>
