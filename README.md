@@ -52,3 +52,20 @@ graph LR
     User[Browser Client] -- HTTP/JSON --> Frontend[React Container :5173]
     Frontend -- REST API --> Backend[Node API Container :5000]
     Backend -- TCP --> Database[PostgreSQL Container :5432]
+
+---
+
+## ⚙ Prerequisites
+
+To run this application as intended (containerized), ensure your system meets the following requirements:
+
+### Required Software
+* **Docker Desktop** (Engine v20.10+) - *Primary requirement for Part 4 evaluation.*
+* **Git** (For cloning the repository).
+
+### System Requirements
+* **OS:** Windows 10/11 (WSL2), macOS, or Linux.
+* **RAM:** Minimum 4GB (8GB recommended for running multiple containers).
+* **Ports:** Ensure ports `5000` (Backend), `5173` (Frontend), and `5433` (Database Host) are available.
+
+*Note: Node.js and PostgreSQL do **not** need to be installed locally as they run within isolated Docker containers.*
