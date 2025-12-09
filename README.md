@@ -108,4 +108,15 @@ The application requires environment variables to connect the services securely.
 cp .env.example .env
 ```
 
+### 4. Run with Docker Compose
+This command will build the images, create the network, start the database, and launch the application.
 
+```bash
+docker-compose up --build
+```
+
+### 5. Access the application
+Once the containers are running, access the services via your browser:
+
+* **Frontend (UI):** [http://localhost:5173](http://localhost:5173)
+* **Backend (API Check):** [http://localhost:5000](http://localhost:5000)
