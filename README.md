@@ -69,7 +69,7 @@ To run this application as intended (containerized), ensure your system meets th
 ### System Requirements
 * **OS:** Windows 10/11 (WSL2), macOS, or Linux.
 * **RAM:** Minimum 4GB (8GB recommended for running multiple containers).
-* **Ports:** Ensure ports `5000` (Backend), `5173` (Frontend), and `5433` (Database Host) are available.
+* **Ports:** Ensure ports `5000` (Backend), `5173` (Frontend), and `5432` (Database Host) are available.
 
 *Note: Node.js and PostgreSQL do **not** need to be installed locally as they run within isolated Docker containers.*
 
