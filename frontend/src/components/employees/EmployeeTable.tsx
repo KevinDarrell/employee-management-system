@@ -65,7 +65,7 @@ export const EmployeeTable = ({ data, isLoading, onToggleStatus, onDelete }: Emp
                   </span>
                 </td>
 
-                {/* Status Toggle UI */}
+
                 <td className="px-6 py-4 text-center">
                   <div className="flex flex-col items-center gap-1.5">
                     <button

@@ -70,7 +70,6 @@ export const EmployeeFormBody = ({ form, onSubmit, isSubmitting }: EmployeeFormB
           {...register('hire_date')}
         />
         
-        {/* Hidden Status Field */}
         <input type="hidden" {...register('status')} />
 
         <div className="flex justify-end pt-6 border-t border-gray-100">

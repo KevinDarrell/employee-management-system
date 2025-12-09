@@ -11,5 +11,4 @@ export const employeeFormSchema = z.object({
   status: z.enum(['active', 'inactive']),
 });
 
-// Export tipe data dari schema ini agar bisa dipakai di component
 export type EmployeeFormValues = z.infer<typeof employeeFormSchema>;

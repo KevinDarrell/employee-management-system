@@ -17,14 +17,7 @@ export interface EmployeeStats {
     count: number;
     avgSalary: number;
   }[];
-  recent: {
-    id: number;
-    name: string;
-    department: string;
-    position: string;
-    status: 'active' | 'inactive';
-    hire_date: string;
-  }[];
+  recent: Employee[];
 }
 
 export interface ApiResponse<T> {

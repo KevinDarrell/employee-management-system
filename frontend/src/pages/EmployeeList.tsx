@@ -4,12 +4,10 @@ import { Plus, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEmployees, useSaveEmployee, useDeleteEmployee } from '../hooks/useEmployees';
 import { Breadcrumbs } from '../components/ui/Breadcrumbs';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
-// Import Components Pecahan
 import { EmployeeFilter } from '../components/employees/EmployeeFilter';
 import { EmployeeTable } from '../components/employees/EmployeeTable';
 
 const EmployeeList = () => {
-  // 1. State Management
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [department, setDepartment] = useState('');
@@ -20,16 +18,16 @@ const EmployeeList = () => {
     type: 'danger' | 'warning' | 'info'; onConfirm: () => void;
   }>({ isOpen: false, title: '', message: '', type: 'danger', onConfirm: () => {} });
 
-  // 2. Data Fetching
+ 
   const { data, isLoading, isError } = useEmployees({ 
     page, limit: 10, search, department, status: statusFilter 
   });
   
-  // 3. Mutations
+  
   const deleteMutation = useDeleteEmployee();
   const updateMutation = useSaveEmployee();
 
-  // 4. Event Handlers
+ 
   const confirmDelete = (id: number, name: string) => {
     setDialogConfig({
       isOpen: true,
@@ -63,7 +61,7 @@ const EmployeeList = () => {
     });
   };
 
-  // 5. Render View
+
   return (
     <div className="space-y-6">
       <Breadcrumbs items={[{ label: 'Employees' }]} />
@@ -96,7 +94,6 @@ const EmployeeList = () => {
           />
         )}
         
-        {/* Pagination Footer */}
         {data?.meta && !isError && (
           <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0 flex justify-between items-center">
              <span className="text-sm text-gray-500">Page {data.meta?.page} of {data.meta?.lastPage}</span>

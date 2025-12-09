@@ -22,7 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <App />
         <Toaster 
-          position="top-center" // Pindah ke tengah atas
+          position="top-center" 
           toastOptions={{
             style: {
               background: '#333',
@@ -32,11 +32,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               fontSize: '14px',
             },
             success: {
-              style: { background: '#10B981' }, // Hijau Modern
+              style: { background: '#10B981' }, 
               iconTheme: { primary: '#fff', secondary: '#10B981' }
             },
             error: {
-              style: { background: '#EF4444' }, // Merah Modern
+              style: { background: '#EF4444' }, 
               iconTheme: { primary: '#fff', secondary: '#EF4444' }
             }
           }} 

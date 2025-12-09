@@ -8,16 +8,9 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        {/* Dashboard */}
         <Route index element={<Dashboard />} />
-        
-        {/* List Employees */}
         <Route path="employees" element={<EmployeeList />} />
-        
-        {/* Add Employee (Create) */}
         <Route path="employees/new" element={<EmployeeForm />} />
-        
-        {/* Edit Employee (Update) - Menangkap ID */}
         <Route path="employees/edit/:id" element={<EmployeeForm />} />
       </Route>
     </Routes>

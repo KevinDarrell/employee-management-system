@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { employeeSchema } from '../utils/validation';
 import prisma from '../config/db';
 
@@ -14,12 +13,10 @@ const throwNotFound = (message: string) => {
 export const getEmployees = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { department, status, search, page = 1, limit = 10 } = req.query;
-    
-
     const skip = (Number(page) - 1) * Number(limit);
     const take = Number(limit);
 
-    const whereClause: any = {};
+    const whereClause: any = {}; 
     if (department) whereClause.department = String(department);
     if (status) whereClause.status = String(status);
 
