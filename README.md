@@ -52,6 +52,7 @@ graph LR
     User[Browser Client] -- HTTP/JSON --> Frontend[React Container :5173]
     Frontend -- REST API --> Backend[Node API Container :5000]
     Backend -- TCP --> Database[PostgreSQL Container :5432]
+```
 
 ---
 
@@ -69,3 +70,42 @@ To run this application as intended (containerized), ensure your system meets th
 * **Ports:** Ensure ports `5000` (Backend), `5173` (Frontend), and `5433` (Database Host) are available.
 
 *Note: Node.js and PostgreSQL do **not** need to be installed locally as they run within isolated Docker containers.*
+
+---
+
+## 🚀 Installation & Setup
+
+Follow these step-by-step instructions to get the application running.
+
+### 1. Clone the repository
+Open your terminal and run:
+```bash
+git clone <repository-url>
+cd employee-management-system
+```
+
+---
+
+### 2. Install dependencies (Optional)
+Note: Docker will automatically install dependencies inside the containers. Run this locally only if you want code completion/intellisense in VS Code.
+
+```bash
+# Backend
+cd backend && npm install
+# Frontend
+cd ../frontend && npm install
+cd ..
+```
+
+---
+
+### 3. Configure environment variables
+The application requires environment variables to connect the services securely.
+
+1.  Create a `.env` file in the **root directory**.
+2.  Copy the content from `.env.example`.
+```bash
+cp .env.example .env
+```
+
+
