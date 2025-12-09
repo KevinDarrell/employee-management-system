@@ -1,41 +1,47 @@
 version: '3.8'
 
 services:
-
   postgres:
     image: postgres:15-alpine
-    container_name: employee_db_container
+    container_name: employee_db
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: employees_db
+      POSTGRES_USER: ${POSTGRES_USER}         
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}             
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
+    restart: always
 
-
+ 
   backend:
     build: ./backend
     container_name: employee_backend
     ports:
-      - "5000:5000"
+      - "${BACKEND_PORT}:5000"
     environment:
-      DATABASE_URL: "postgresql://admin:password123@postgres:5432/employees_db?schema=public"
+      DATABASE_URL: ${DATABASE_URL}           
       PORT: 5000
+      NODE_ENV: production
     depends_on:
       - postgres
     networks:
       - app-network
+    restart: always
 
+ 
   frontend:
     build: ./frontend
     container_name: employee_frontend
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT}:5173"
+    environment:
+      # Browser tetap akses localhost komputer host
+      VITE_API_URL: "http://localhost:${BACKEND_PORT}/api"
     depends_on:
       - backend
     networks:
