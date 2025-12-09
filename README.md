@@ -45,10 +45,6 @@ The application strictly adheres to **Clean Code** principles, utilizing **MVC A
 ---
 
 ## 🏗 System Architecture
-
-The application runs on a multi-container architecture orchestrated by Docker Compose.
-
-```mermaid
 graph LR
     User[Browser Client] -- HTTP/JSON --> Frontend[React Container :5173]
     Frontend -- REST API --> Backend[Node API Container :5000]
