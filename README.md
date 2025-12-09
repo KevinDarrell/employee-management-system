@@ -205,6 +205,7 @@ curl -X POST "http://localhost:5000/api/employees" \
 ```bash
 curl -X GET "http://localhost:5000/api/employees/stats"
 ```
+---
 
 ## 📂 Project Structure
 
@@ -249,13 +250,20 @@ During the development process, several technical challenges were encountered an
 * **Challenge:** Prisma requires specific binary targets to run correctly on Alpine Linux containers (used in Docker), which differ from the local development environment (Windows/Mac).
 * **Solution:** Configured `binaryTargets` in `schema.prisma` to explicitly include both `"native"` and `"linux-musl-openssl-3.0.x"`. Additionally, manual installation of `openssl` was added to the backend Dockerfile to support Prisma's cryptographic requirements.
 
-### 2. Node.js & Vite Versioning
-* **Challenge:** The latest version of Vite requires Node.js 20+, causing build failures on older default Node.js images.
-* **Solution:** Standardized all Dockerfiles (both Frontend and Backend) to use `node:22-alpine`. This ensures long-term support, compatibility with modern tooling, and keeps the image size minimal.
+### 2. End-to-End Type Safety & Validation
+* **Challenge:** Keeping validation logic synchronized between the Client (Frontend) and Server (Backend) is error-prone. Inconsistent rules can lead to security vulnerabilities or poor User Experience.
+* **Solution:** Adopted a **Schema-First Approach** using **Zod**. We created strict validation schemas that act as a single source of truth. These schemas are used by **React Hook Form** for immediate UI feedback and reused (conceptually) in the **Express Middleware** to reject malicious requests before they reach the database.
 
 ### 3. Responsive Data Visualization
 * **Challenge:** Rendering complex data charts (Area Charts) that remain readable on both wide desktop screens and narrow mobile devices.
 * **Solution:** Utilized `Recharts`'s `ResponsiveContainer` wrapper combined with Tailwind CSS Grid system. The layout automatically stacks components on mobile and expands them on desktop, ensuring a seamless UX across devices.
+
+### 4. Container Optimization & Alpine Compatibility
+* **Challenge:** The default Node.js Docker images are large (1GB+) and slow to build. Furthermore, running Prisma ORM on **Alpine Linux** (a lightweight distro) often causes binary compatibility issues with OpenSSL.
+* **Solution:**
+    1.  Migrated to `node:22-alpine` to reduce image size significantly (~50MB base).
+    2.  Optimized **Docker Layer Caching** by copying `package.json` before source code (preventing `npm install` on every code change).
+    3.  Configured `schema.prisma` binary targets to explicitly support `linux-musl` for stable production deployments.
 
 ---
 
