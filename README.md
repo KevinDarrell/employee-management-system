@@ -69,11 +69,3 @@ Follow these steps to deploy the application locally using a single command.
 ```bash
 git clone <repository-url>
 cd employee-management-system
-
-
-
-
-
-
-
-
