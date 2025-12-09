@@ -61,7 +61,9 @@ graph LR
 To run this application as intended (containerized), ensure your system meets the following requirements:
 
 ### Required Software
-* **Docker Desktop** (Engine v20.10+) - *Primary requirement for Part 4 evaluation.*
+* **Docker Engine** (v20.10+) & **Docker Compose**
+    * *Windows/Mac:* I recommend installing [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+    * *Linux:* Install `docker-ce` and `docker-compose-plugin` via CLI.
 * **Git** (For cloning the repository).
 
 ### System Requirements
@@ -142,22 +144,67 @@ Once the containers are running, access the services via your browser:
 
 ## 📡 API Documentation
 
-Base URL: `http://localhost:5000/api/employees`
+**Base URL:** `http://localhost:5000/api`
 
-| Method | Endpoint | Description | Request Body |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/` | Get list (Filter, Search, Paginate) | - |
-| `GET` | `/:id` | Get single employee details | - |
-| `POST` | `/` | Create new employee | `{ name, email, position, department, salary, hire_date }` |
-| `PUT` | `/:id` | Update employee details | `{ name, email, ... }` |
-| `DELETE`| `/:id` | Permanently delete employee | - |
-| `GET` | `/stats` | Get Dashboard analytics | - |
+### 1. Standard Response Format
+The API follows a standardized JSON response structure (JSend-like) to ensure consistency across the frontend and mobile clients.
 
-**Sample Curl Command (Search):**
-```bash
-curl "http://localhost:5000/api/employees?search=Manager&page=1&limit=5"
+**Success Response:**
+```json
+{
+  "status": "success",
+  "data": { ... },     // The requested payload (Object or Array)
+  "meta": {            // Optional pagination  metadata
+    "total": 50,
+    "page": 1,
+    "limit": 10
+  }
+}
+```
+**Success Response:**
+```json
+{
+  "status": "error",
+  "message": "Invalid email format" // Human-readable error message
+}
 ```
 ---
+### 2. Endpoints Reference
+
+| Method | Endpoint | Description | Request Body (JSON) |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/employees` | List employees (Search, Filter, Paginate) | *None (Params via URL)* |
+| `GET` | `/employees/:id` | Get details of one employee | *None (ID via URL)* |
+| `POST` | `/employees` | Create a new employee | `{ name, email, position, department, salary, hire_date }` |
+| `PUT` | `/employees/:id` | Update employee details | `{ name, email, ... }` (Partial update allowed) |
+| `DELETE`| `/employees/:id` | Soft delete or Hard delete | *None (ID via URL)* |
+| `GET` | `/employees/stats`| Get dashboard analytics data | *None* |
+
+### 3. Sample Usage (CURL)
+
+**A. Search & Filter Employees**
+*Get employees named "Budi" in "IT" department, page 1.*
+```bash
+curl -X GET "http://localhost:5000/api/employees?search=Budi&department=IT&page=1&limit=10" \
+     -H "Accept: application/json"
+```
+**B. Create New Employee Add a new backend engineer (POST request example).**
+```bash
+curl -X POST "http://localhost:5000/api/employees" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "name": "Alice Wonderland",
+           "email": "alice@company.com",
+           "position": "Backend Engineer",
+           "department": "IT",
+           "salary": 15000000,
+           "hire_date": "2024-01-01T00:00:00.000Z"
+         }'
+```
+**C. Get Dashboard Statistics**
+```bash
+curl -X GET "http://localhost:5000/api/employees/stats"
+```
 
 ## 📂 Project Structure
 
