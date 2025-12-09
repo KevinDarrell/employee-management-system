@@ -8,7 +8,7 @@ interface StatsGridProps {
 
 export const StatsGrid = ({ stats, newHiresCount }: StatsGridProps) => {
   const statCards = [
-    { label: 'Total Active', value: stats.totalEmployees, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Total Active Employee', value: stats.totalEmployees, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
     { label: 'Departments', value: stats.breakdown.length, icon: Briefcase, color: 'text-purple-600', bg: 'bg-purple-50' },
     { label: 'Growth (Month)', value: `+${newHiresCount} New`, icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-50' },
   ];

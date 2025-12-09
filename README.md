@@ -84,8 +84,6 @@ git clone <repository-url>
 cd employee-management-system
 ```
 
----
-
 ### 2. Install dependencies (Optional)
 Note: Docker will automatically install dependencies inside the containers. Run this locally only if you want code completion/intellisense in VS Code.
 
@@ -96,8 +94,6 @@ cd backend && npm install
 cd ../frontend && npm install
 cd ..
 ```
-
----
 
 ### 3. Configure environment variables
 The application requires environment variables to connect the services securely.
@@ -120,3 +116,125 @@ Once the containers are running, access the services via your browser:
 
 * **Frontend (UI):** [http://localhost:5173](http://localhost:5173)
 * **Backend (API Check):** [http://localhost:5000](http://localhost:5000)
+
+---
+
+## ✨ Key Features
+
+### 📊 Executive Dashboard
+* **Interactive Charts:** Area charts visualizing average salary distribution per department.
+* **Real-time Metrics:** Total active employees, departmental breakdown, and monthly growth.
+* **Paginated Recent Hires:** Client-side pagination for browsing recent additions.
+
+### 👥 Advanced Employee Management
+* **Smart Search:** Multi-column search (Name, Email, Position, Department).
+* **Sticky Table Headers:** Optimized UX for viewing large datasets.
+* **Soft Delete System:**
+    * **Toggle Status:** Deactivate employees (Soft Delete) with a warning dialog.
+    * **Trash:** Permanently delete employees (Hard Delete) with a danger dialog.
+
+### 🛡️ Robust Validation & UX
+* **Real-time Validation:** Forms utilize Zod schema validation (e.g., Minimum Salary IDR 1M, valid Email).
+* **Feedback System:** Dynamic Toast notifications (Success, Error, Info) and Loading Skeletons.
+* **Responsive Design:** Fully optimized for Mobile and Desktop views.
+
+---
+
+## 📡 API Documentation
+
+Base URL: `http://localhost:5000/api/employees`
+
+| Method | Endpoint | Description | Request Body |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | Get list (Filter, Search, Paginate) | - |
+| `GET` | `/:id` | Get single employee details | - |
+| `POST` | `/` | Create new employee | `{ name, email, position, department, salary, hire_date }` |
+| `PUT` | `/:id` | Update employee details | `{ name, email, ... }` |
+| `DELETE`| `/:id` | Permanently delete employee | - |
+| `GET` | `/stats` | Get Dashboard analytics | - |
+
+**Sample Curl Command (Search):**
+```bash
+curl "http://localhost:5000/api/employees?search=Manager&page=1&limit=5"
+```
+---
+
+## 📂 Project Structure
+
+The project follows a scalable Monorepo-like structure with clear separation of concerns.
+
+```text
+root/
+├── backend/                  # REST API Service (Express + TypeScript)
+│   ├── prisma/               # Database Schema & Migrations
+│   ├── src/
+│   │   ├── config/           # DB Connection (Singleton Pattern)
+│   │   ├── controllers/      # Business Logic & Request Handling
+│   │   ├── middleware/       # Global Error Handling
+│   │   ├── routes/           # API Route Definitions
+│   │   ├── utils/            # Zod Schemas & Helper Functions
+│   │   ├── app.ts            # Express App Configuration
+│   │   └── server.ts         # Server Entry Point
+│   └── Dockerfile            # Backend Container Config
+├── frontend/                 # React UI Service (Vite + TypeScript)
+│   ├── src/
+│   │   ├── components/       # Component-Based Architecture
+│   │   │   ├── dashboard/    # Specific Dashboard Widgets
+│   │   │   ├── employees/    # Employee-specific Features
+│   │   │   └── ui/           # Reusable Atomic Components (Card, Button, etc.)
+│   │   ├── hooks/            # Custom React Query Hooks (Data Layer)
+│   │   ├── pages/            # Page Controllers / Layouts
+│   │   └── lib/              # Shared Utilities (Axios, Schemas)
+│   └── Dockerfile            # Frontend Container Config
+├── database/
+│   └── init.sql              # Auto-seeding Script for PostgreSQL
+├── docker-compose.yml        # Container Orchestration Config
+└── README.md                 # Project Documentation
+```
+
+---
+
+## 💡 Challenges & Solutions
+
+During the development process, several technical challenges were encountered and resolved to ensure enterprise-grade stability.
+
+### 1. Cross-Platform Compatibility (Docker & Prisma)
+* **Challenge:** Prisma requires specific binary targets to run correctly on Alpine Linux containers (used in Docker), which differ from the local development environment (Windows/Mac).
+* **Solution:** Configured `binaryTargets` in `schema.prisma` to explicitly include both `"native"` and `"linux-musl-openssl-3.0.x"`. Additionally, manual installation of `openssl` was added to the backend Dockerfile to support Prisma's cryptographic requirements.
+
+### 2. Node.js & Vite Versioning
+* **Challenge:** The latest version of Vite requires Node.js 20+, causing build failures on older default Node.js images.
+* **Solution:** Standardized all Dockerfiles (both Frontend and Backend) to use `node:22-alpine`. This ensures long-term support, compatibility with modern tooling, and keeps the image size minimal.
+
+### 3. Responsive Data Visualization
+* **Challenge:** Rendering complex data charts (Area Charts) that remain readable on both wide desktop screens and narrow mobile devices.
+* **Solution:** Utilized `Recharts`'s `ResponsiveContainer` wrapper combined with Tailwind CSS Grid system. The layout automatically stacks components on mobile and expands them on desktop, ensuring a seamless UX across devices.
+
+---
+
+## 🔮 Future Roadmap
+
+If given more time, the following features would be prioritized to further enhance the application's capabilities:
+
+* **Authentication & Authorization (JWT):** Implement secure login for HR administrators and role-based access control (RBAC) to distinguish between Admin (Write access) and Employee (Read-only access) views.
+* **Data Export:** Add functionality to export the employee list to CSV or Excel formats for external reporting.
+* **Automated Testing:** Implement unit and integration tests using `Jest` (for Backend) and `Vitest` (for Frontend) to ensure code reliability and prevent regression.
+* **CI/CD Pipeline:** Setup GitHub Actions to automatically lint, build, and run tests upon every commit to the repository.
+
+---
+
+## 📸 Screenshots
+
+### Executive Dashboard
+> *Real-time insights on salary distribution and recent hires.*
+![Dashboard Preview](screenshots/dashboard.png)
+
+### Employee List (Active & Inactive)
+> *Advanced data grid with soft delete toggles and multi-column search.*
+![Employee List](screenshots/list.png)
+
+### Add/Edit Form with Validation
+> *Secure form with real-time validation and responsive layout.*
+![Employee Form](screenshots/form.png)
+
+---
