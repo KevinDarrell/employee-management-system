@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { employeeSchema } from '../utils/validation';
-
-const prisma = new PrismaClient();
+import prisma from '../config/db';
 
 
 const throwNotFound = (message: string) => {
