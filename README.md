@@ -67,42 +67,13 @@ Follow these steps to deploy the application locally using a single command.
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repository-url>
+git clone <repository-url>
 cd employee-management-system
 
-```bash
-### 2. Configure Environment Variables
-Copy the example environment file to create your local configuration.
-```bash
-cp .env.example .env
 
-The default credentials in .env.example are pre-configured to work out-of-the-box with the Docker setup.3. Run with Docker ComposeExecute the build and run command:Bashdocker-compose up --build
-What happens next?Docker pulls the node:22-alpine and postgres:15-alpine images.Backend installs dependencies (including OpenSSL for Prisma).Database initializes and seeds sample data via init.sql.Frontend builds and serves via Vite.4. Access the ApplicationOnce the logs indicate the server is running:Frontend (Dashboard): http://localhost:5173Backend (API Status): http://localhost:5000✨ Key Features📊 Executive DashboardInteractive Charts: Area charts visualizing average salary distribution per department.Real-time Metrics: Total active employees, departmental breakdown, and monthly growth.Paginated Recent Hires: Client-side pagination for browsing recent additions.👥 Advanced Employee ManagementSmart Search: Multi-column search (Name, Email, Position, Department).Sticky Table Headers: Optimized UX for viewing large datasets.Soft Delete System:Toggle Status: Deactivate employees (Soft Delete) with a warning dialog.Trash: Permanently delete employees (Hard Delete) with a danger dialog.🛡️ Robust Validation & UXReal-time Validation: Forms utilize Zod schema validation (e.g., Minimum Salary IDR 1M, valid Email).Feedback System: Dynamic Toast notifications (Success, Error, Info) and Loading Skeletons.Responsive Design: Fully optimized for Mobile and Desktop views.📡 API DocumentationBase URL: http://localhost:5000/api/employeesMethodEndpointDescriptionRequest BodyGET/Get list (Filter, Search, Paginate)-GET/:idGet single employee details-POST/Create new employee{ name, email, ... }PUT/:idUpdate employee details{ name, ... }DELETE/:idPermanently delete employee-GET/statsGet Dashboard analytics-Sample Curl Command (Search):Bashcurl "http://localhost:5000/api/employees?search=Manager&page=1&limit=5"
-📂 Project StructurePlaintextroot/
-├── backend/                  # REST API Service
-│   ├── prisma/               # Database Schema
-│   ├── src/
-│   │   ├── config/           # DB Connection (Singleton)
-│   │   ├── controllers/      # Business Logic
-│   │   ├── middleware/       # Global Error Handling
-│   │   ├── utils/            # Zod Schemas
-│   │   ├── app.ts            # Express App Setup
-│   │   └── server.ts         # Server Entry Point
-│   └── Dockerfile
-├── frontend/                 # React UI Service
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── dashboard/    # Dashboard Widgets
-│   │   │   ├── employees/    # Employee Features (Table, Filter)
-│   │   │   └── ui/           # Reusable Atomic Components (Card, Dialog)
-│   │   ├── hooks/            # Custom React Query Hooks
-│   │   ├── pages/            # Page Controllers
-│   │   └── lib/              # Schemas & Axios Config
-│   └── Dockerfile
-├── database/
-│   └── init.sql              # Auto-seeding Script
-├── docker-compose.yml        # Orchestration Config
-└── README.md
-💡 Challenges & Solutions1. Cross-Platform Compatibility (Docker)Challenge: Prisma requires specific binary targets to run on Alpine Linux containers, which differ from the local Windows/Mac environment.Solution: Configured binaryTargets in schema.prisma to include both "native" and "linux-musl-openssl-3.0.x", and manually installed openssl in the Dockerfile.2. Node.js & Vite CompatibilityChallenge: The latest Vite version requires Node.js 20+, but many default images use older versions.Solution: Standardized all Dockerfiles to use node:22-alpine to ensure long-term stability and compatibility with the latest frontend tooling.3. Responsive Data VisualizationChallenge: Rendering charts that look good on both wide desktop screens and narrow mobile devices.Solution: Utilized Recharts ResponsiveContainer combined with Tailwind's Grid system to create a dashboard that stacks gracefully on mobile but expands on desktop.🔮 Future RoadmapAuthentication (JWT): Implement secure login and role-based access control (Admin vs Viewer).Export Data: Add functionality to export the employee list to CSV/Excel.Unit Testing: Implement Jest for backend API testing and Vitest for frontend component testing.CI/CD: Setup GitHub Actions for automated linting and build checks.
+
+
+
+
 
 
